@@ -8,7 +8,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 現在のステータス
 
-**第一フェーズの要件定義・設計は完了。バックエンド（server）のAPIは主要機能を一通り実装・疎通確認済み。フロントエンド（client）はプレースホルダーのみで未着手。** pnpm workspaces によるモノレポ（`server`＝Node.js/TypeScript/Fastify、`client`＝Vue.js/TypeScript/Vite）。
+**第一フェーズの要件定義・設計は完了。バックエンド（server）・フロントエンド（client）とも主要画面を一通り実装済み。** pnpm workspaces によるモノレポ（`server`＝Node.js/TypeScript/Fastify、`client`＝Vue.js/TypeScript/Vite）。本番（さくらのVPS）へのバックエンドデプロイも完了済み（後述）。
+
+フロントエンド（client）で実装済みの画面（vue-router、Basic認証はブラウザネイティブのダイアログに委譲）:
+
+- 購入商品登録・一覧（`/stock-items`）：メイン画面。支払い内訳・ポイント内訳の動的行入力、到着/売却記録フォーム
+- 月次収益確認（`/monthly-summary`）：前月/翌月ナビゲーション付き
+- 商品／販売先／クレジットカードマスタ（`/products` `/sales-channels` `/credit-cards`）：専用フォーム
+- 仕入れ先／支払い方法／ポイント種別マスタ（`/shops` `/payment-methods` `/point-types`）：共通コンポーネント`SimpleMasterView.vue`を`basePath`/`title` propsで使い回し
+- クレジットカード支払い管理（`/credit-card-billings`）：カード×年月のマトリクス、アカウント単位の小計行
+- `GET /api/config/*`（accounts/credit-card-brands/purchase-types/purchase-sites）をバックエンドに追加し、設定ファイルの内容をフロント側の選択肢として取得
+
+**未検証事項:** このリポジトリの開発環境にGUIブラウザが無いため、型チェック（vue-tsc）・ビルド・lintは全て通っているが、実ブラウザでの見た目・操作感は未確認。
+
+### 本番環境（さくらのVPS）
+
+- ホスト: `ik1-410-37199.vs.sakura.ne.jp` (153.127.24.203)、Ubuntu 24.04 LTS、1GBプラン
+- Node.js 22・PostgreSQL 16をVPSに直接インストール、Dockerは不使用
+- `stock-manager.service`（systemd）でバックエンドを常駐、`/home/ubuntu/stock-manager`にGitHubからclone
+- Caddyがリバースプロキシ＋Let's EncryptでHTTPS化（証明書は`ik1-410-37199.vs.sakura.ne.jp`のさくら標準ホスト名で取得）
+- セキュリティ: ufw（22/80/443のみ許可）、fail2ban、SSHパスワード認証無効化・鍵認証のみ、自動操作専用鍵`~/.ssh/id_ed25519_stockmanager`
+- **フロントエンド（client）は本番デプロイパイプライン未整備**（Caddy/Node側で静的アセットを配信する設定がまだ無い）。次回作業時はこれを繋ぎ込む必要がある
 
 バックエンドで実装済みのAPI（すべてBasic認証必須）:
 

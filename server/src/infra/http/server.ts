@@ -11,6 +11,7 @@ import { createMonthlySummaryRepository } from "../db/repositories/monthlySummar
 import { createShopRepository } from "../db/repositories/shopRepository.js";
 import { createStockItemRepository } from "../db/repositories/stockItemRepository.js";
 import { registerBasicAuth } from "./middleware/basicAuth.js";
+import { registerConfigRoutes } from "./routes/config.js";
 import { registerCreditCardBillingRoutes } from "./routes/creditCardBillings.js";
 import { registerCreditCardRoutes } from "./routes/creditCards.js";
 import { registerHealthRoute } from "./routes/health.js";
@@ -19,6 +20,7 @@ import { registerProductRoutes } from "./routes/products.js";
 import { registerSalesChannelRoutes } from "./routes/salesChannels.js";
 import { registerSimpleMasterRoutes } from "./routes/simpleMaster.js";
 import { registerStockItemRoutes } from "./routes/stockItems.js";
+import { registerStaticClient } from "./staticClient.js";
 
 export async function buildServer(): Promise<FastifyInstance> {
   const app = Fastify({ logger: true });
@@ -33,6 +35,7 @@ export async function buildServer(): Promise<FastifyInstance> {
 
   await registerBasicAuth(app);
   await registerHealthRoute(app);
+  await registerConfigRoutes(app);
 
   await registerProductRoutes(app, createProductRepository(db));
   await registerSalesChannelRoutes(app, createSalesChannelRepository(db));
@@ -43,6 +46,8 @@ export async function buildServer(): Promise<FastifyInstance> {
   await registerCreditCardBillingRoutes(app, createCreditCardBillingRepository(db));
   await registerStockItemRoutes(app, createStockItemRepository(db));
   await registerMonthlySummaryRoutes(app, createMonthlySummaryRepository(db));
+
+  await registerStaticClient(app);
 
   return app;
 }
