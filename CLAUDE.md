@@ -28,7 +28,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `stock-manager.service`（systemd）でバックエンドを常駐、`/home/ubuntu/stock-manager`にGitHubからclone
 - Caddyがリバースプロキシ＋Let's EncryptでHTTPS化（証明書は`ik1-410-37199.vs.sakura.ne.jp`のさくら標準ホスト名で取得）
 - セキュリティ: ufw（22/80/443のみ許可）、fail2ban、SSHパスワード認証無効化・鍵認証のみ、自動操作専用鍵`~/.ssh/id_ed25519_stockmanager`
-- **フロントエンド（client）は本番デプロイパイプライン未整備**（Caddy/Node側で静的アセットを配信する設定がまだ無い）。次回作業時はこれを繋ぎ込む必要がある
+- フロントエンド（client）もデプロイ済み：`server/src/infra/http/staticClient.ts`が`@fastify/static`でclientのビルド成果物（`client/dist`）を配信し、APIパス以外のGETはSPAフォールバックで`index.html`を返す
+- 更新手順: VPS上で`git pull && pnpm install && pnpm build && sudo systemctl restart stock-manager.service`（スクリプト化はまだ）
 
 バックエンドで実装済みのAPI（すべてBasic認証必須）:
 
