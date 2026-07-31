@@ -73,8 +73,8 @@ onMounted(load);
 
 <template>
   <section>
-    <h1>クレジットカード支払い管理</h1>
-    <p v-if="error" class="error">{{ error }}</p>
+    <h1 class="page-title">クレジットカード支払い管理</h1>
+    <p v-if="error" class="error-banner">{{ error }}</p>
 
     <label class="year-picker">
       対象年
@@ -118,39 +118,21 @@ onMounted(load);
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
 }
 
 .year-picker input {
   width: 6rem;
 }
 
-.table-scroll {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  text-align: left;
-  padding: 0.4rem;
-  border-bottom: 1px solid var(--border-color, #ddd);
-  white-space: nowrap;
-}
-
 td input {
   width: 5rem;
 }
 
-.subtotal-row {
-  font-weight: bold;
-  background: color-mix(in srgb, currentColor 6%, transparent);
-}
-
-.error {
-  color: #c0392b;
+.subtotal-row td {
+  font-weight: 700;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
 }
 </style>

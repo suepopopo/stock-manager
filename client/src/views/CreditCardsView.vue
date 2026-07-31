@@ -138,10 +138,10 @@ onMounted(async () => {
 
 <template>
   <section>
-    <h1>クレジットカードマスタ</h1>
-    <p v-if="error" class="error">{{ error }}</p>
+    <h1 class="page-title">クレジットカードマスタ</h1>
+    <p v-if="error" class="error-banner">{{ error }}</p>
 
-    <form class="card-form" @submit.prevent="add">
+    <form class="card form-grid" @submit.prevent="add">
       <select v-model="newItem.accountKey" required>
         <option value="" disabled>アカウント</option>
         <option v-for="a in accounts" :key="a.key" :value="a.key">{{ a.label }}</option>
@@ -164,7 +164,7 @@ onMounted(async () => {
       <input v-model="newItem.annualFeeAmount" type="number" placeholder="年会費金額" />
       <input v-model="newItem.annualFeePaymentDay" type="number" placeholder="年会費支払日(1-31)" min="1" max="31" />
       <input v-model="newItem.memo" type="text" placeholder="備考" />
-      <button type="submit">追加</button>
+      <button type="submit" class="btn btn-primary">追加</button>
     </form>
 
     <div class="table-scroll">
@@ -203,8 +203,8 @@ onMounted(async () => {
                 </select>
               </td>
               <td class="actions">
-                <button type="button" @click="saveEdit(item.id)">保存</button>
-                <button type="button" @click="cancelEdit">キャンセル</button>
+                <button type="button" class="btn btn-sm btn-primary" @click="saveEdit(item.id)">保存</button>
+                <button type="button" class="btn btn-sm" @click="cancelEdit">キャンセル</button>
               </td>
             </template>
             <template v-else>
@@ -215,8 +215,8 @@ onMounted(async () => {
               <td>{{ item.cardLast4 }}</td>
               <td>{{ item.status }}</td>
               <td class="actions">
-                <button type="button" @click="startEdit(item)">編集</button>
-                <button type="button" @click="remove(item.id)">削除</button>
+                <button type="button" class="btn btn-sm" @click="startEdit(item)">編集</button>
+                <button type="button" class="btn btn-sm btn-danger" @click="remove(item.id)">削除</button>
               </td>
             </template>
           </tr>
@@ -227,37 +227,13 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.card-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+form.card {
+  margin-bottom: 1.25rem;
+}
+
+form.card label {
+  display: inline-flex;
   align-items: center;
-}
-
-.table-scroll {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  text-align: left;
-  padding: 0.5rem;
-  border-bottom: 1px solid var(--border-color, #ddd);
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
-
-.error {
-  color: #c0392b;
+  gap: 0.3rem;
 }
 </style>

@@ -67,12 +67,12 @@ onMounted(load);
 
 <template>
   <section>
-    <h1>{{ title }}</h1>
-    <p v-if="error" class="error">{{ error }}</p>
+    <h1 class="page-title">{{ title }}</h1>
+    <p v-if="error" class="error-banner">{{ error }}</p>
 
-    <form class="add-form" @submit.prevent="add">
+    <form class="card form-grid" @submit.prevent="add">
       <input v-model="newName" type="text" placeholder="新規登録" />
-      <button type="submit">追加</button>
+      <button type="submit" class="btn btn-primary">追加</button>
     </form>
 
     <div class="table-scroll">
@@ -91,12 +91,12 @@ onMounted(load);
             </td>
             <td class="actions">
               <template v-if="editingId === item.id">
-                <button type="button" @click="saveEdit(item.id)">保存</button>
-                <button type="button" @click="cancelEdit">キャンセル</button>
+                <button type="button" class="btn btn-sm btn-primary" @click="saveEdit(item.id)">保存</button>
+                <button type="button" class="btn btn-sm" @click="cancelEdit">キャンセル</button>
               </template>
               <template v-else>
-                <button type="button" @click="startEdit(item)">編集</button>
-                <button type="button" @click="remove(item.id)">削除</button>
+                <button type="button" class="btn btn-sm" @click="startEdit(item)">編集</button>
+                <button type="button" class="btn btn-sm btn-danger" @click="remove(item.id)">削除</button>
               </template>
             </td>
           </tr>
@@ -107,35 +107,7 @@ onMounted(load);
 </template>
 
 <style scoped>
-.add-form {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.table-scroll {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  text-align: left;
-  padding: 0.5rem;
-  border-bottom: 1px solid var(--border-color, #ddd);
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
-
-.error {
-  color: #c0392b;
+form.card {
+  margin-bottom: 1.25rem;
 }
 </style>

@@ -46,7 +46,6 @@ function emptyForm() {
     shopId: "",
     purchasePrice: "",
     purchaseDate: "",
-    arrivedFlag: false,
     memo: "",
     paymentDetails: [] as PaymentDetailForm[],
     pointDetails: [] as PointDetailForm[],
@@ -122,7 +121,6 @@ async function submit(): Promise<void> {
       shopId: Number(form.shopId),
       purchasePrice: Number(form.purchasePrice),
       purchaseDate: form.purchaseDate,
-      arrivedFlag: form.arrivedFlag,
       memo: form.memo || undefined,
       paymentDetails: form.paymentDetails.map((d) => ({
         paymentMethodId: Number(d.paymentMethodId),
@@ -215,10 +213,10 @@ onMounted(async () => {
 
 <template>
   <section>
-    <h1>購入商品登録</h1>
-    <p v-if="error" class="error">{{ error }}</p>
+    <h1 class="page-title">購入商品登録</h1>
+    <p v-if="error" class="error-banner">{{ error }}</p>
 
-    <form class="stock-form" @submit.prevent="submit">
+    <form class="card stock-form" @submit.prevent="submit">
       <div class="row">
         <select v-model="form.productId" required>
           <option value="" disabled>商品</option>
@@ -244,7 +242,6 @@ onMounted(async () => {
       <div class="row">
         <input v-model="form.purchasePrice" type="number" placeholder="仕入れ価格" required />
         <label>仕入れ日 <input v-model="form.purchaseDate" type="date" required /></label>
-        <label><input v-model="form.arrivedFlag" type="checkbox" /> 到着済み</label>
         <input v-model="form.groupId" type="text" placeholder="グループID（任意）" />
         <input v-model="form.memo" type="text" placeholder="備考" />
       </div>
@@ -265,9 +262,9 @@ onMounted(async () => {
             <option value="">ポイント種別（該当時）</option>
             <option v-for="p in pointTypes" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
-          <button type="button" @click="removePaymentDetail(index)">削除</button>
+          <button type="button" class="btn btn-sm btn-danger" @click="removePaymentDetail(index)">削除</button>
         </div>
-        <button type="button" @click="addPaymentDetail">支払い内訳を追加</button>
+        <button type="button" class="btn btn-sm" @click="addPaymentDetail">支払い内訳を追加</button>
       </fieldset>
 
       <fieldset>
@@ -278,12 +275,12 @@ onMounted(async () => {
             <option v-for="p in pointTypes" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
           <input v-model="detail.amount" type="number" placeholder="獲得ポイント" />
-          <button type="button" @click="removePointDetail(index)">削除</button>
+          <button type="button" class="btn btn-sm btn-danger" @click="removePointDetail(index)">削除</button>
         </div>
-        <button type="button" @click="addPointDetail">ポイント内訳を追加</button>
+        <button type="button" class="btn btn-sm" @click="addPointDetail">ポイント内訳を追加</button>
       </fieldset>
 
-      <button type="submit" class="primary">登録</button>
+      <button type="submit" class="btn btn-primary">登録</button>
     </form>
 
     <div class="table-scroll">
@@ -311,12 +308,14 @@ onMounted(async () => {
               <td>{{ item.purchasePrice.toLocaleString() }}</td>
               <td>{{ item.netPurchasePrice.toLocaleString() }}</td>
               <td>{{ item.salesPrice?.toLocaleString() ?? "-" }}</td>
-              <td>{{ item.profit?.toLocaleString() ?? "-" }}</td>
+              <td :class="{ 'profit-positive': (item.profit ?? 0) > 0, 'profit-negative': (item.profit ?? 0) < 0 }">
+                {{ item.profit?.toLocaleString() ?? "-" }}
+              </td>
               <td>{{ item.profitRate !== null ? `${item.profitRate.toFixed(1)}%` : "-" }}</td>
-              <td>{{ item.status }}</td>
+              <td><span class="status-badge" :class="`status-${item.status}`">{{ item.status }}</span></td>
               <td class="actions">
-                <button type="button" @click="openSaleForm(item)">到着/売却記録</button>
-                <button type="button" @click="remove(item.id)">削除</button>
+                <button type="button" class="btn btn-sm" @click="openSaleForm(item)">到着/売却記録</button>
+                <button type="button" class="btn btn-sm btn-danger" @click="remove(item.id)">削除</button>
               </td>
             </tr>
             <tr v-if="saleFormItemId === item.id" class="sale-form-row">
@@ -330,8 +329,8 @@ onMounted(async () => {
                   <label>売却日 <input v-model="saleForm.salesDate" type="date" /></label>
                   <label><input v-model="saleForm.arrivedFlag" type="checkbox" /> 到着済み</label>
                   <label><input v-model="saleForm.soldFlag" type="checkbox" /> 売却済み</label>
-                  <button type="button" @click="saveSale(item.id)">保存</button>
-                  <button type="button" @click="closeSaleForm">キャンセル</button>
+                  <button type="button" class="btn btn-sm btn-primary" @click="saveSale(item.id)">保存</button>
+                  <button type="button" class="btn btn-sm" @click="closeSaleForm">キャンセル</button>
                 </div>
               </td>
             </tr>
@@ -346,11 +345,8 @@ onMounted(async () => {
 .stock-form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.9rem;
   margin-bottom: 1.5rem;
-  padding: 1rem;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 8px;
 }
 
 .row {
@@ -360,45 +356,52 @@ onMounted(async () => {
   align-items: center;
 }
 
+.row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
 fieldset {
-  border: 1px dashed var(--border-color, #ccc);
-  border-radius: 6px;
-  padding: 0.5rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
 }
 
-button.primary {
+legend {
+  padding: 0 0.4rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.stock-form > .btn-primary {
   align-self: flex-start;
-  font-weight: bold;
-}
-
-.table-scroll {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  text-align: left;
-  padding: 0.4rem;
-  border-bottom: 1px solid var(--border-color, #ddd);
-  white-space: nowrap;
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
 }
 
 .sale-form-row td {
-  background: color-mix(in srgb, currentColor 5%, transparent);
+  background: var(--color-surface-alt);
   white-space: normal;
 }
 
-.error {
-  color: #c0392b;
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+}
+
+.status-badge.status-売却済み {
+  background: color-mix(in srgb, var(--color-success) 15%, transparent);
+  color: var(--color-success);
+}
+
+.status-badge.status-保有中 {
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
 }
 </style>
